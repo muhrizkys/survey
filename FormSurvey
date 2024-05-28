@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Form Isian Proyek</title>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+    </style>
+    <script>
+        function addField(section) {
+            var container = document.getElementById(section);
+            var div = document.createElement("div");
+            div.className = section + "-item";
+
+            var input = document.createElement("input");
+            input.type = "text";
+            input.name = section + "[]";
+            input.placeholder = "Nama " + section.charAt(0).toUpperCase() + section.slice(1);
+            div.appendChild(input);
+
+            if (section === "dinding" || section === "pekerjaan") {
+                var lebar = document.createElement("input");
+                lebar.type = "number";
+                lebar.name = section + "Lebar[]";
+                lebar.placeholder = "Lebar (m)";
+                lebar.step = "0.01";
+                div.appendChild(lebar);
+
+                var tinggi = document.createElement("input");
+                tinggi.type = "number";
+                tinggi.name = section + "Tinggi[]";
+                tinggi.placeholder = "Tinggi (m)";
+                tinggi.step = "0.01";
+                div.appendChild(tinggi);
+            }
+
+            var removeButton = document.createElement("button");
+            removeButton.type = "button";
+            removeButton.innerText = "Cancel";
+            removeButton.onclick = function() {
+                container.removeChild(div);
+            };
+            div.appendChild(removeButton);
+
+            container.appendChild(div);
+        }
+
+        function generateTable(data) {
+            var table = document.createElement("table");
+            var header = table.insertRow();
+            Object.keys(data).forEach(function(key) {
+                var cell = header.insertCell();
+                cell.outerHTML = "<th>" + key + "</th>";
+            });
+
+            var rowCount = data[Object.keys(data)[0]].length;
+            for (var i = 0; i < rowCount; i++) {
+                var row = table.insertRow();
+                Object.keys(data).forEach(function(key) {
+                    var cell = row.insertCell();
+                    cell.innerText = data[key][i];
+                });
+            }
+
+            return table;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('proyekForm').onsubmit = function(event) {
+                event.preventDefault();
+                var formData = new FormData(this);
+                var result = {};
+                formData.forEach((value, key) => {
+                    if (!result[key]) {
+                        result[key] = [];
+                    }
+                    result[key].push(value);
+                });
+
+                var resultContainer = document.getElementById('result');
+                resultContainer.innerHTML = "";
+                resultContainer.appendChild(generateTable(result));
+            }
+        });
+    </script>
+</head>
+<body>
+    <h1>Form Isian Proyek</h1>
+    <form id="proyekForm">
+        <label>Nama Klien:</label>
+        <input type="text" name="nama_klien"><br>
+
+        <label>Area Proyek:</label>
+        <input type="text" name="area_proyek"><br>
+
+        <label>Area:</label>
+        <input type="text" name="area"><br>
+
+        <div id="ruangan">
+            <label>Ruangan:</label>
+            <input type="text" name="ruangan[]"><br>
+        </div>
+        <button type="button" onclick="addField('ruangan')">Tambah Ruangan</button><br>
+
+        <div id="dinding">
+            <label>Dinding:</label>
+        </div>
+        <button type="button" onclick="addField('dinding')">Tambah Dinding</button><br>
+
+        <div id="pekerjaan">
+            <label>Pekerjaan:</label>
+        </div>
+        <button type="button" onclick="addField('pekerjaan')">Tambah Pekerjaan</button><br>
+
+        <input type="submit" value="Submit">
+    </form>
+
+    <div id="result"></div>
+</body>
+</html>
